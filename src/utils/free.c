@@ -1,33 +1,53 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.h                                            :+:      :+:    :+:   */
+/*   free.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kaisobe <kaisobe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/02 15:48:29 by kaisobe           #+#    #+#             */
-/*   Updated: 2025/01/03 18:00:10 by kaisobe          ###   ########.fr       */
+/*   Created: 2025/01/05 13:44:16 by kaisobe           #+#    #+#             */
+/*   Updated: 2025/01/05 13:44:51 by kaisobe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PIPEX_H
-# define PIPEX_H
+#include "pipex.h"
 
-# define SHELL "bash"
-# define INPUT 0
-# define OUTPUT 1
-# define READ 0
-# define WRITE 1
-# define CHILD_PID 0
+void	ft_free_arrs(int **arr)
+{
+	int	i;
 
-# include "libft.h"
-# include <fcntl.h>
-# include <limits.h>
-# include <stdio.h>
-# include <stdlib.h>
-# include <sys/stat.h>
-# include <sys/types.h>
-# include <sys/wait.h>
-# include <unistd.h>
+	i = 0;
+	while (arr[i])
+	{
+		free(arr[i]);
+		i++;
+	}
+	free(arr);
+}
 
-#endif
+void	ft_free_str3(char ***strs)
+{
+	int i;
+
+	i = 0;
+	while (strs[i])
+	{
+		ft_free_strs(strs[i]);
+		i++;
+	}
+	free(strs);
+	return ;
+}
+
+
+int	is_directory(char *str)
+{
+	if (ft_strchr(str, '/'))
+		return (1);
+	return (0);
+}
+
+int	is_command(char *str)
+{
+	return (!is_directory(str));
+}
