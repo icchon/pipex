@@ -6,106 +6,127 @@
 /*   By: kaisobe <kaisobe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/05 13:41:39 by kaisobe           #+#    #+#             */
-/*   Updated: 2025/01/07 20:41:07 by kaisobe          ###   ########.fr       */
+/*   Updated: 2025/01/10 18:40:58 by kaisobe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int	std_pipe(t_vars *data, char **env)
-{
-	int		**pipes;
-	pid_t	pid;
-	char	buff[BUFFER_SIZE];
-	int		status;
-	int		file_fds[2];
-	int		res;
-	char	*msg;
-	size_t	i;
-	size_t	cmd_cnt;
+int exec_command(t_astnode *node){
+	int pipes[2];
+	int status;
+	t_redirect *redirect;
+	redirect = node->redirects;
+	int fd;
+	
 
-	cmd_cnt = ft_strslen((const char **)data->cmds);
-	pipes = create_pipes(cmd_cnt);
-	file_fds[INPUT] = open(data->infile, O_RDONLY);
-	if (file_fds[INPUT] == -1)
-	{
-		msg = ft_strjoin("bash: ", data->infile);
-		return (perror(msg), free(msg), 0);
-	}
-	dup2(file_fds[INPUT], STDIN_FILENO);
-	close(file_fds[INPUT]);
-	file_fds[OUTPUT] = open(data->outfile, O_WRONLY);
-	if (file_fds[OUTPUT] == -1)
-	{
-		if (ft_path_exist(data->outfile))
-		{
-			msg = ft_strjoin("bash: ", data->outfile);
-			return (perror(msg), free(msg), 0);
-		}
-		close(ft_create_file(data->outfile));
-		file_fds[OUTPUT] = open(data->outfile, O_WRONLY);
-		if (file_fds[OUTPUT] == -1)
-		{
-			perror(NULL);
-			return (0);
-		}
-	}
-	close(file_fds[OUTPUT]);
-	i = 0;
-	while (i < cmd_cnt)
-	{
-		pipe(pipes[i]);
-		pid = fork();
-		if (pid == CHILD_PID)
-		{
-			close(pipes[i][READ]);
-			dup2(pipes[i][WRITE], STDOUT_FILENO);
-			close(pipes[i][WRITE]);
-			res = try_command(data->cmds[i], data->cmd_args[i], env);
-			if (!res)
-			{
-				if (is_command(data->cmds[i]))
-					ft_dprintf(2, "%s: command not found\n", data->cmds[i]);
-				else
-					ft_dprintf(2, "bash: %s: No such file or directory\n",
-						data->cmds[i]);
+	
+	pipe(pipes);
+	
+	pid_t pid = fork();
+	if (pid == CHILD_PID)
+	{	
+		close(pipes[READ]);
+		dup2(pipes[WRITE], STDOUT_FILENO);
+		close(pipes[WRITE]);
+		while(redirect){
+			if(redirect->type == TK_INPUT_FILE){
+				fd = open(redirect->data, O_RDONLY);
+				dup2(fd, STDIN_FILENO);
 			}
-			exit(EXIT_FAILURE);
+			else if(redirect->type == TK_OUTPUT_FILE){
+				fd = open(redirect->data, O_WRONLY | O_TRUNC | O_CREAT, S_IRGRP | S_IROTH | S_IWUSR | S_IRUSR);
+				dup2(fd, STDOUT_FILENO);
+			}
+			else if(redirect->type == TK_OUTPUT_FILE_APPEND){
+				fd = open(redirect->data, O_WRONLY | O_APPEND | O_CREAT, S_IRGRP | S_IROTH | S_IWUSR | S_IRUSR);
+				dup2(fd, STDOUT_FILENO);
+			}
+			close(fd);
+			redirect = redirect->next;
 		}
-		wait(&status);
-		if (status != EXIT_SUCCESS)
-			exit(EXIT_FAILURE);
-		close(pipes[i][WRITE]);
-		dup2(pipes[i][READ], STDIN_FILENO);
-		close(pipes[i][READ]);
-		i++;
+		int res = try_command(node->cmd->data, node->arg_strs, grobal_env(GET, NULL));
+		if (!res)
+		{
+			if (is_command(node->cmd->data))
+				ft_dprintf(2, "%s: command not found\n", node->cmd->data);
+			else
+				ft_dprintf(2, "bash: %s: No such file or directory\n",
+					node->cmd->data);
+		}
+		exit(EXIT_FAILURE);
 	}
-	ft_bzero(buff, BUFFER_SIZE);
-	read(STDIN_FILENO, buff, BUFFER_SIZE);
-	if (data->is_heredoc)
-		file_fds[OUTPUT] = open(data->outfile, O_WRONLY | O_APPEND);
-	else
-		file_fds[OUTPUT] = open(data->outfile, O_WRONLY | O_TRUNC);
-	ft_dprintf(file_fds[OUTPUT], buff);
-	close(file_fds[OUTPUT]);
-	return (1);
+	wait(&status);
+	if (status != EXIT_SUCCESS)
+		exit(EXIT_FAILURE);
+	close(pipes[WRITE]);
+	dup2(pipes[READ], STDIN_FILENO);
+	close(pipes[READ]);
+	
+	return status;
+}	
+
+char **create_args(t_arg* args){
+	char **out;
+	t_arg* arg;
+	size_t arg_len;
+	arg_len = size_token(args);
+	size_t i;
+	i = 0;
+	arg = args;
+	out = ft_calloc(arg_len + 2, sizeof(char * ));
+	out[0] = "(^o^)";
+	while(arg){
+		out[i+1] = arg->data;
+		arg = arg->next;
+	}
+	return out;
 }
 
-int	**create_pipes(size_t cmd_cnt)
-{
-	int		**pipes;
-	size_t	i;
-
-	pipes = (int **)malloc(sizeof(int *) * (cmd_cnt + 1));
-	if (!pipes)
-		return (NULL);
-	i = 0;
-	while (i < cmd_cnt)
-	{
-		pipes[i] = (int *)malloc(sizeof(int) * 2);
-		if (!pipes[i++])
-			return (ft_free_arrs(pipes), NULL);
+void set_exec(t_astnode *node){
+	if(!node)
+		return;
+	
+	if(node->args){
+		node->arg_cnt = size_token(node->args);
+		node->arg_strs = create_args(node->args);
 	}
-	pipes[cmd_cnt] = NULL;
-	return (pipes);
+	return ;
+}
+
+t_astnode * executer(t_astnode *root){
+	t_astnode_type type;
+	t_astnode *left;
+	type = root->type;
+	if(!root){
+		return NULL;
+	}
+	if(type == ASTND_CMD){
+
+		expander(root);
+		set_exec(root);
+		exec_command(root);
+		return root;
+	}
+	else if(type == ASTND_PIPE){
+		executer(root->left);
+		executer(root->right);	
+	}
+	else{
+		left = executer(root->left);
+		if(type == ASTND_AND){
+			if(left){
+				executer(root->right);
+			}
+		}
+		else if(type == ASTND_OR){
+			if(!left){
+				executer(root->right);
+			}
+		}
+		else{
+			perror(NULL);
+		}
+	}
+	return NULL;
 }

@@ -6,7 +6,7 @@
 /*   By: kaisobe <kaisobe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/05 13:45:25 by kaisobe           #+#    #+#             */
-/*   Updated: 2025/01/07 20:37:55 by kaisobe          ###   ########.fr       */
+/*   Updated: 2025/01/09 16:36:56 by kaisobe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int	try_command(char *cmd, char **arg, char **env)
 		free(path);
 		return (0);
 	}
-	execve(path, arg, __environ);
+	execve(path, arg, env);
 	return (0);
 }
 
@@ -39,7 +39,7 @@ char	*process_heredoc(char *limiter)
 	input_file = ft_create_random_file(".tmp");
 	while (1)
 	{
-		ft_printf("> ");
+		ft_printf("heredoc> ");
 		ft_bzero(tmp, BUFFER_SIZE);
 		read(STDIN_FILENO, tmp, BUFFER_SIZE);
 		tmp[ft_strlen(tmp) - 1] = '\0';

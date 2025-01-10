@@ -6,7 +6,7 @@
 /*   By: kaisobe <kaisobe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/05 11:50:39 by kaisobe           #+#    #+#             */
-/*   Updated: 2025/01/05 16:53:54 by kaisobe          ###   ########.fr       */
+/*   Updated: 2025/01/09 14:21:44 by kaisobe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,13 +48,13 @@ void	addback_token(t_token **token, t_token *new)
 	t_token	*last_node;
 
 	last_node = last_token(*token);
+	new->next = NULL;
+	new->prev = last_node;
 	if (last_node == NULL)
 	{
 		*token = new;
 		return ;
 	}
-	new->prev = last_node;
-	new->next = NULL;
 	last_node->next = new;
 	return ;
 }
@@ -82,6 +82,18 @@ t_token	*head_token(t_token *token)
 		node = node->prev;
 	}
 	return (node);
+}
+
+size_t size_token(t_token *token){
+	t_token *node;
+	node = token;
+	size_t cnt;
+	cnt = 0;
+	while(node){
+		node = node->next;
+		cnt++;
+	}
+	return cnt;
 }
 
 void	delone_token(t_token *token, void (*del)(void *))

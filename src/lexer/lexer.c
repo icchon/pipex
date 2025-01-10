@@ -6,7 +6,7 @@
 /*   By: kaisobe <kaisobe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/05 13:40:34 by kaisobe           #+#    #+#             */
-/*   Updated: 2025/01/08 01:31:13 by kaisobe          ###   ########.fr       */
+/*   Updated: 2025/01/09 13:42:50 by kaisobe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ int	tokenizer(t_token **token_ptr)
 		}
 		else if(ft_isequal(current->data, ">>")){
 			current->type = TK_REDIRECT_OUT_APPEND;
-			next->type = TK_OUTPUT_FILE;
+			next->type = TK_OUTPUT_FILE_APPEND;
 		}
 		else if(ft_isequal(current->data, "||")){
 			current->type = TK_OR;
@@ -92,12 +92,18 @@ int	tokenizer(t_token **token_ptr)
 			current->type = TK_WORD;
 		}
 	}
+	if(current->type == TK_UNDEFINED){
+		current->type = TK_WORD;
+	}
 	return 0;
 }
 
 
 void print_token(t_token *token){
-	
+	if(!token){
+		printf("null\n");
+		return;
+	}
 	printf("data : %s\n", token->data);
 	int type;
 	type = (int)token->type;
@@ -117,6 +123,8 @@ void print_token(t_token *token){
 		printf("type : TK_INPUT_FILE\n");
 	else if(type == TK_OUTPUT_FILE)
 		printf("type : TK_OUTPUT_FILE\n");
+	else if(type == TK_OUTPUT_FILE_APPEND)
+		printf("type : TK_OUTPUT_FILE_APPEND\n");
 	else if(type == TK_REDIRECT_OUT)
 		printf("type : TK_REDIRECT_OUT\n");
 	else if(type == TK_REDIRECT_OUT_APPEND)
@@ -128,12 +136,11 @@ void print_token(t_token *token){
 	else {
 		printf("type : error\n");
 	}
-	printf("----------------------------------------\n");
 }
 
 void print_tokens(t_token *token){
 	t_token *node;
-	node = head_token(token);
+	node = token;
 	while(node){
 		print_token(node);
 		node = node->next;
@@ -150,7 +157,7 @@ t_token	*lexer(char *line)
 	int		status[ASCII_SIZE];
 
 	init_lexer_status(status);
-	line = "< infile grep \"$USER\"&& wc -w | cat | echo $LANG || cat << EOF>>outfile";
+
 	head = NULL;
 	i = 0;
 	while (line[i])
@@ -201,7 +208,6 @@ t_token	*lexer(char *line)
 		//printf("----------------------\n");
 	}
 	tokenizer(&head);
-	//print_tokens(head);
-	return (new_token(1, ""));
+	return (head);
 }
 
