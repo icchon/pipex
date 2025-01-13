@@ -6,50 +6,72 @@
 /*   By: kaisobe <kaisobe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/05 13:45:25 by kaisobe           #+#    #+#             */
-/*   Updated: 2025/01/09 16:36:56 by kaisobe          ###   ########.fr       */
+/*   Updated: 2025/01/13 22:38:21 by kaisobe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int	try_command(char *cmd, char **arg, char **env)
+static char	**create_args(t_astnode *node)
 {
-	char	*path;
+	char	**out;
+	t_arg	*arg;
+	size_t	arg_len;
+	size_t	i;
 
-	path = ft_get_absolute_path(cmd, env);
-	if (!is_directory(path) || !path)
-		return (0);
-	if (access(path, X_OK) != 0)
+	if (!node)
+		return (NULL);
+	arg_len = size_token(node->args);
+	i = 1;
+	arg = node->args;
+	out = (char **)malloc(sizeof(char *) * (arg_len + 2));
+	if (!out)
+		return (NULL);
+	out[0] = node->cmd->data;
+	while (arg)
 	{
-		free(path);
-		return (0);
+		out[i++] = arg->data;
+		arg = arg->next;
 	}
-	execve(path, arg, env);
-	return (0);
+	out[arg_len + 1] = NULL;
+	return (out);
 }
 
-char	*process_heredoc(char *limiter)
+static void	set_exec(t_astnode *node)
 {
-	char	*input_file;
-	char	buff[BUFFER_SIZE];
-	char	tmp[BUFFER_SIZE];
-	int		fd;
-
-	ft_bzero(buff, BUFFER_SIZE);
-	input_file = ft_create_random_file(".tmp");
-	while (1)
+	if (!node)
+		return ;
+	if (node->args)
 	{
-		ft_printf("heredoc> ");
-		ft_bzero(tmp, BUFFER_SIZE);
-		read(STDIN_FILENO, tmp, BUFFER_SIZE);
-		tmp[ft_strlen(tmp) - 1] = '\0';
-		if (ft_isequal(limiter, tmp))
-			break ;
-		ft_strlcat(buff, tmp, BUFFER_SIZE);
-		ft_strlcat(buff, "\n", BUFFER_SIZE);
+		node->arg_cnt = size_token(node->args);
+		node->arg_strs = xsafe(end, (t_fvoid)create_args, 1, node);
 	}
-	fd = open(input_file, O_WRONLY);
-	ft_dprintf(fd, buff);
-	close(fd);
-	return (input_file);
+	return ;
+}
+
+t_astnode	*executer(t_astnode *root)
+{
+	t_astnode_type	type;
+	t_astnode		*left;
+
+	type = root->type;
+	if (!root)
+		return (NULL);
+	if (type == ASTND_CMD)
+	{
+		if (!(expander(root), set_exec(root), exec_command(root)))
+			return (NULL);
+		return (root);
+	}
+	else if (type == ASTND_PIPE)
+		return (executer(root->left), executer(root->right), NULL);
+	else
+	{
+		left = executer(root->left);
+		if (type == ASTND_AND && left)
+			executer(root->right);
+		else if (type == ASTND_OR && !left)
+			executer(root->right);
+	}
+	return (NULL);
 }

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   token.c                                            :+:      :+:    :+:   */
+/*   token_util1.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kaisobe <kaisobe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/05 11:50:39 by kaisobe           #+#    #+#             */
-/*   Updated: 2025/01/09 14:21:44 by kaisobe          ###   ########.fr       */
+/*   Created: 2025/01/13 13:16:22 by kaisobe           #+#    #+#             */
+/*   Updated: 2025/01/13 13:16:51 by kaisobe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,8 @@ void	addback_token(t_token **token, t_token *new)
 {
 	t_token	*last_node;
 
+	if (!new)
+		return ;
 	last_node = last_token(*token);
 	new->next = NULL;
 	new->prev = last_node;
@@ -82,56 +84,4 @@ t_token	*head_token(t_token *token)
 		node = node->prev;
 	}
 	return (node);
-}
-
-size_t size_token(t_token *token){
-	t_token *node;
-	node = token;
-	size_t cnt;
-	cnt = 0;
-	while(node){
-		node = node->next;
-		cnt++;
-	}
-	return cnt;
-}
-
-void	delone_token(t_token *token, void (*del)(void *))
-{
-	if (token == NULL)
-		return ;
-	del(token->data);
-	free(token);
-	return ;
-}
-
-void	delete_token(t_token **token, t_token *to_delete)
-{
-	t_token	*node;
-	t_token	*prev;
-	t_token	*next;
-
-	node = head_token(*token);
-	if (!node)
-		return ;
-	while (node)
-	{
-		if (node == to_delete)
-		{
-			prev = node->prev;
-			next = node->next;
-			if (prev)
-				prev->next = next;
-			if (next)
-				next->prev = prev;
-			delone_token(node, free);
-			if (!prev && !next)
-			{
-				*token = NULL;
-			}
-			return ;
-		}
-		node = node->next;
-	}
-	return ;
 }

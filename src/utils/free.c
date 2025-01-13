@@ -6,7 +6,7 @@
 /*   By: kaisobe <kaisobe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/05 13:44:16 by kaisobe           #+#    #+#             */
-/*   Updated: 2025/01/05 13:44:51 by kaisobe          ###   ########.fr       */
+/*   Updated: 2025/01/13 10:54:38 by kaisobe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	ft_free_arrs(int **arr)
 
 void	ft_free_str3(char ***strs)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (strs[i])
@@ -38,7 +38,6 @@ void	ft_free_str3(char ***strs)
 	free(strs);
 	return ;
 }
-
 
 int	is_directory(char *str)
 {

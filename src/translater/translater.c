@@ -6,52 +6,60 @@
 /*   By: kaisobe <kaisobe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/05 13:22:27 by kaisobe           #+#    #+#             */
-/*   Updated: 2025/01/05 13:22:36 by kaisobe          ###   ########.fr       */
+/*   Updated: 2025/01/13 17:28:54 by kaisobe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-char	*translate_like_bash(char **args)
+static void	process_edges(char **args, size_t *i, size_t arg_len, char **out)
 {
-	size_t	i;
-	char	*out;
-	size_t	arg_len;
-
-	arg_len = ft_strslen((const char **)args);
-	out = NULL;
-	i = 0;
-	if (ft_isequal(args[i], "here_doc"))
+	if (ft_isequal(args[*i], "here_doc"))
 	{
-		out = ft_strjoin_safe(out, args[i + 2], 1, 0);
-		out = ft_strjoin_safe(out, "<< ", 1, 0);
-		out = ft_strjoin_safe(out, args[i + 1], 1, 0);
-		i += 3;
+		*out = xsafe(end, (t_fvoid)ft_strjoin_safe, 4, *out, args[*i + 2], 1,
+				0);
+		*out = xsafe(end, (t_fvoid)ft_strjoin_safe, 4, *out, "<< ", 1, 0);
+		*out = xsafe(end, (t_fvoid)ft_strjoin_safe, 4, *out, args[*i + 1], 1,
+				0);
+		(*i) += 3;
 		if (arg_len != 4)
 		{
-			out = ft_strjoin_safe(out, "| ", 1, 0);
+			*out = xsafe(end, (t_fvoid)ft_strjoin_safe, 4, *out, "| ", 1, 0);
 		}
 	}
 	else
 	{
-		out = ft_strjoin_safe(out, "< ", 1, 0);
-		out = ft_strjoin_safe(out, args[0], 1, 0);
-		out = ft_strjoin_safe(out, " ", 1, 0);
-		i++;
+		*out = xsafe(end, (t_fvoid)ft_strjoin_safe, 4, *out, "< ", 1, 0);
+		*out = xsafe(end, (t_fvoid)ft_strjoin_safe, 4, *out, args[0], 1, 0);
+		*out = xsafe(end, (t_fvoid)ft_strjoin_safe, 4, *out, " ", 1, 0);
+		(*i)++;
 	}
-	while (i < arg_len)
+}
+
+char	*translate_like_bash(char **args)
+{
+	size_t	i;
+	char	*out;
+	size_t	len;
+
+	len = ft_strslen((const char **)args);
+	out = NULL;
+	i = 0;
+	process_edges(args, &i, len, &out);
+	while (i < len)
 	{
-		if (i == arg_len - 2)
+		if (i == len - 2)
 		{
-			out = ft_strjoin_safe(out, args[arg_len - 2], 1, 0);
-			out = ft_strjoin_safe(out, "> ", 1, 0);
-			out = ft_strjoin_safe(out, args[arg_len - 1], 1, 0);
+			out = xsafe(end, (t_fvoid)ft_strjoin_safe, 4, out, args[len - 2], 1,
+					0);
+			out = xsafe(end, (t_fvoid)ft_strjoin_safe, 4, out, "> ", 1, 0);
+			out = xsafe(end, (t_fvoid)ft_strjoin_safe, 4, out, args[len - 1], 1,
+					0);
 			break ;
 		}
-		out = ft_strjoin_safe(out, args[i], 1, 0);
-		out = ft_strjoin_safe(out, "| ", 1, 0);
+		out = xsafe(end, (t_fvoid)ft_strjoin_safe, 4, out, args[i], 1, 0);
+		out = xsafe(end, (t_fvoid)ft_strjoin_safe, 4, out, "|", 1, 0);
 		i++;
 	}
-	printf("%s\n", out);
 	return (out);
 }
