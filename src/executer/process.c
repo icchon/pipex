@@ -6,7 +6,7 @@
 /*   By: kaisobe <kaisobe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/05 13:41:39 by kaisobe           #+#    #+#             */
-/*   Updated: 2025/01/13 22:21:44 by kaisobe          ###   ########.fr       */
+/*   Updated: 2025/01/24 12:44:49 by kaisobe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,10 @@ static int	try_command(char *cmd, char **arg, char **env)
 
 	path = ft_get_absolute_path(cmd, env);
 	if (!is_directory(path) || !path)
+	{
+		free(path);
 		return (0);
+	}
 	if (access(path, X_OK) != 0)
 	{
 		free(path);
@@ -89,9 +92,10 @@ int	exec_command(t_astnode *node)
 		child_process(pipes, redirect, node);
 	}
 	wait(&status);
-	if (status != EXIT_SUCCESS)
-		return (0);
 	close(pipes[WRITE]);
 	dup2(pipes[READ], STDIN_FILENO);
+	close(pipes[READ]);
+	if (status != EXIT_SUCCESS)
+		return (0);
 	return (1);
 }

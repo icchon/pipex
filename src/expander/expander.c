@@ -6,7 +6,7 @@
 /*   By: kaisobe <kaisobe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/05 13:39:35 by kaisobe           #+#    #+#             */
-/*   Updated: 2025/01/13 18:44:51 by kaisobe          ###   ########.fr       */
+/*   Updated: 2025/01/24 14:07:48 by kaisobe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,8 @@ char	*replace_env_vars(char *str, char **env)
 		{
 			len = ft_calc_next_str(&str[++i], "\t\n\v\f\r $");
 			key = xsafe(end, (t_fvoid)ft_substr, 3, &str[i], 0, len);
-			out = (free(key), xsafe(end, (t_fvoid)ft_strjoin_safe, 4, out,
-						ft_get_env(key, env), 1, 0));
+			out = xsafe(end, (t_fvoid)ft_strjoin_safe, 4, out, ft_get_env(key,
+						env), 1, (free(key), 0));
 		}
 		else
 		{

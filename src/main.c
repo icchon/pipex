@@ -6,7 +6,7 @@
 /*   By: kaisobe <kaisobe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 15:48:19 by kaisobe           #+#    #+#             */
-/*   Updated: 2025/01/13 22:43:30 by kaisobe          ###   ########.fr       */
+/*   Updated: 2025/01/24 14:06:52 by kaisobe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,22 +38,24 @@ int	main(int argc, char *argv[], char **env)
 	t_token		*tokens;
 	t_astnode	*tree;
 	char		buff[BUFFER_SIZE];
-	const char	*line = "echo 'Hello, World!' > output.txt";
 
 	if (argc < 5)
 		return (0);
 	grobal_env(SET, env);
 	input = translate_like_bash(&argv[1]);
 	grobal_bashinput(SET, input);
-	tokens = lexer((char *)line);
+	tokens = lexer((char *)input);
 	grobal_token(SET, tokens);
 	tree = parser(tokens);
 	grobal_asttree(SET, tree);
 	check_fds(tree);
 	executer(tree);
-	ft_bzero(buff, BUFFER_SIZE);
-	read(STDIN_FILENO, buff, BUFFER_SIZE);
-	ft_dprintf(STDOUT_FILENO, "%s", buff);
+	if (tree)
+	{
+		ft_bzero(buff, BUFFER_SIZE);
+		read(STDIN_FILENO, buff, BUFFER_SIZE);
+		ft_dprintf(STDOUT_FILENO, "%s", buff);
+	}
 	end();
 	return (0);
 }

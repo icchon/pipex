@@ -6,7 +6,7 @@
 /*   By: kaisobe <kaisobe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 15:48:29 by kaisobe           #+#    #+#             */
-/*   Updated: 2025/01/13 22:44:57 by kaisobe          ###   ########.fr       */
+/*   Updated: 2025/01/24 12:39:08 by kaisobe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,7 @@ typedef struct s_astnode
 	struct s_astnode	*left;
 	struct s_astnode	*right;
 }						t_astnode;
+
 t_astnode				*executer(t_astnode *root);
 void					exec_heredoc(t_astnode *node);
 int						exec_command(t_astnode *node);

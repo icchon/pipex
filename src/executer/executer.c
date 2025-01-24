@@ -6,7 +6,7 @@
 /*   By: kaisobe <kaisobe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/05 13:45:25 by kaisobe           #+#    #+#             */
-/*   Updated: 2025/01/13 22:38:21 by kaisobe          ###   ########.fr       */
+/*   Updated: 2025/01/24 12:15:02 by kaisobe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,9 +54,9 @@ t_astnode	*executer(t_astnode *root)
 	t_astnode_type	type;
 	t_astnode		*left;
 
-	type = root->type;
 	if (!root)
 		return (NULL);
+	type = root->type;
 	if (type == ASTND_CMD)
 	{
 		if (!(expander(root), set_exec(root), exec_command(root)))

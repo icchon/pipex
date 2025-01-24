@@ -6,7 +6,7 @@
 /*   By: kaisobe <kaisobe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 13:16:22 by kaisobe           #+#    #+#             */
-/*   Updated: 2025/01/13 13:16:51 by kaisobe          ###   ########.fr       */
+/*   Updated: 2025/01/24 12:02:42 by kaisobe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,6 @@ t_token	*last_token(t_token *token)
 	if (token == NULL)
 		return (token);
 	node = token;
-	if (node->next == NULL)
-	{
-	}
 	while (node->next != NULL)
 	{
 		node = node->next;

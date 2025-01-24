@@ -6,7 +6,7 @@
 /*   By: kaisobe <kaisobe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/12 20:38:28 by kaisobe           #+#    #+#             */
-/*   Updated: 2025/01/13 22:45:40 by kaisobe          ###   ########.fr       */
+/*   Updated: 2025/01/24 14:08:11 by kaisobe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,8 @@ int	tokenizer(t_token **token_ptr)
 	t_token	*prev;
 
 	current = head_token(*token_ptr);
+	if (!current)
+		return (0);
 	next = current->next;
 	while (next)
 	{
