@@ -6,7 +6,7 @@
 /*   By: kaisobe <kaisobe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/02 15:48:19 by kaisobe           #+#    #+#             */
-/*   Updated: 2025/01/24 14:06:52 by kaisobe          ###   ########.fr       */
+/*   Updated: 2025/01/24 14:37:15 by kaisobe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	end(void)
 		free(grobal_tmpfile(GET, NULL));
 	}
 	free(grobal_bashinput(GET, NULL));
-	exit(EXIT_FAILURE);
+	exit(EXIT_SUCCESS);
 	return ;
 }
 
